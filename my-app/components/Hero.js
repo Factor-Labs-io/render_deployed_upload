@@ -69,14 +69,14 @@ const Hero = () => {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-10">
-      <div className="border-2 border-red-500 h-[550px] text-center flex-col justify-between space-y-[425px]">
+      <div className="h-[550px] text-center flex-col justify-between space-y-[425px]">
         <h1 className="text-white font-serif">
           <h1 className="text-white font-serif">
             Welcome to {`Ananda and Vishal's Wedding`}
           </h1>
         </h1>
 
-        <div className="border-2 border-blue-500 flex-col justify-center items-center">
+        <div className="flex-col justify-center items-center">
           <h1 className="text-white font-serif pb-2">
             Send us a photo for our Gallery!
           </h1>
