@@ -1,10 +1,13 @@
 import { Hero } from "@/components";
-import Image from "next/image";
+import styles from "./globals.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
   return (
-    <main>
+    <main className={styles.container}>
       <Hero />
+      <ToastContainer />
     </main>
   );
 }

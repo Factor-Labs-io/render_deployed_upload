@@ -17,9 +17,66 @@
 }
 
 body {
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
   color: rgb(var(--foreground-rgb));
-  background-image: url("/ananda.jpg");
-  background-size: auto;
+}
+
+.bg-image {
+  background-image: url("/background.jpg"); /* Replace with your image path */
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  height: 100vh; /* Set the height to cover the entire viewport height */
+  overflow-x: hidden; /* Disable horizontal scrolling */
+}
+
+/* Ensure responsiveness for mobile devices */
+@media (min-width: 600px) {
+  .bg-image {
+    background-size: cover;
+    background-image: url("/anandaback.jpeg");
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    overflow-x: hidden; /* Disable horizontal scrolling */
+  }
+}
+
+@media (min-width: 1024px) {
+  .bg-image {
+    background-size: contain;
+    background-image: url("/anandaback.jpeg");
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    overflow-x: hidden; /* Disable horizontal scrolling */
+  }
+}
+
+.container {
+  max-width: 100%; /* Adjust this value as needed */
+  margin: 0 auto; /* Center the content horizontally */
+  padding: 0 20px; /* Add some padding to the sides if desired */
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

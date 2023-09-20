@@ -1,11 +1,14 @@
 "use client";
 import Image from "next/image";
 import "./globals.css";
+import styles from "./globals.css";
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Hero = () => {
   const [selectedFiles, setSelectedFiles] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (event) => {
     const files = event.target.files;
@@ -36,63 +39,86 @@ const Hero = () => {
       console.error("No files selected for upload.");
       return;
     }
+    setUploading(true);
 
-    console.log("Begin upload");
+    const promise = new Promise(async (resolve, reject) => {
+      const uploadPromises = selectedFiles.map(async (fileData) => {
+        try {
+          const base64Data = fileData.data.split(",")[1]; // Get the Base64-encoded data part
 
-    const uploadPromises = selectedFiles.map(async (fileData) => {
+          if (!base64Data) {
+            throw new Error(`Invalid file data for ${fileData.name}`);
+          }
+
+          const data = {
+            name: fileData.name,
+            fileData: base64Data, // Send the Base64-encoded data
+          };
+
+          const response = await axios.post("/upload", data, {
+            headers: {
+              "Content-Type": "application/json", // Set the content type to JSON
+            },
+          });
+
+          if (response.status === 200) {
+            console.log(`File ${fileData.name} uploaded successfully`);
+            // toast.success(`File ${fileData.name} uploaded successfully`, {
+            //   position: "top-right",
+            //   autoClose: 5000,
+            // });
+          } else {
+            console.error(`File ${fileData.name} upload failed`);
+            toast.error(`File upload failed`, {
+              position: "top-right",
+              autoClose: 5000,
+            });
+          }
+        } catch (error) {
+          console.error(`Error during upload of ${fileData.name}:`, error);
+          toast.error(`Error during upload: ${error.message}`, {
+            position: "top-right",
+            autoClose: 5000,
+          });
+          reject(error);
+        }
+      });
+
       try {
-        const base64Data = fileData.data.split(",")[1]; // Get the Base64-encoded data part
-
-        if (!base64Data) {
-          throw new Error(`Invalid file data for ${fileData.name}`);
-        }
-
-        const data = {
-          name: fileData.name,
-          fileData: base64Data, // Send the Base64-encoded data
-        };
-
-        const response = await axios.post("/upload", data, {
-          headers: {
-            "Content-Type": "application/json", // Set the content type to JSON
-          },
-        });
-
-        if (response.status === 200) {
-          console.log(`File ${fileData.name} uploaded successfully`);
-          // You can handle success (e.g., display a success message) here.
-        } else {
-          console.error(`File ${fileData.name} upload failed`);
-          // Handle errors (e.g., display an error message) here.
-        }
+        await Promise.all(uploadPromises);
+        resolve();
       } catch (error) {
-        console.error(`Error during upload of ${fileData.name}:`, error);
-        // Handle errors (e.g., display an error message) here.
+        reject(error);
       }
     });
 
-    // Wait for all uploads to complete
-    await Promise.all(uploadPromises);
+    // Use toast.promise to show "promise pending" notification
+    const promiseId = toast.promise(promise, {
+      pending: "Uploading images...", // This is the "promise pending" message
+      success: "Upload complete!", // This is displayed when the promise resolves
+      error: "Upload failed!", // This is displayed when the promise rejects
+      closeOnClick: false, // Prevent the user from dismissing the notification
+    });
 
-    console.log("All files uploaded.");
+    // Set up a callback to remove the "promise pending" notification when it's closed
+    toast.done(promiseId);
+    setUploading(false);
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-10">
-      <div className="h-[550px] text-center flex-col justify-between space-y-[425px]">
-        <h1 className="text-white font-serif">
-          <h1 className="text-white font-serif">
-            Welcome to {`Ananda and Vishal's Wedding`}
-          </h1>
+    <main className={`${styles.container} bg-image`}>
+      <div className="h-full text-center flex flex-col justify-between items-center pb-48">
+        <h1 className="pt-3 text-black font-serif text-lg md:text-2xl">
+          Welcome to {`Ananda and Vishal's Wedding`}
         </h1>
 
-        <div className="flex-col justify-center items-center">
-          <h1 className="text-white font-serif pb-2">
-            Send us a photo for our Gallery!
+        <div className="flex flex-col justify-center items-center">
+          <h1 className="text-black font-serif pb-2 text-lg md:text-2xl">
+            Send us a photo for our gallery!
           </h1>
 
           <input
-            className="pl-40 pb-2"
+            className="pl-40 pb-2 md:text-xl"
             type="file"
             onChange={handleFileChange}
             accept="image/*"
@@ -100,8 +126,9 @@ const Hero = () => {
           />
 
           <button
-            className="text-white bg-gradient-to-br from-green-700 to-green-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+            className="md:text-xl text-white bg-gradient-to-br from-green-700 to-green-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
             onClick={handleUpload}
+            disabled={uploading}
           >
             Submit
           </button>
