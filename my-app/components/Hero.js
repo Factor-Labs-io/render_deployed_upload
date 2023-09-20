@@ -63,10 +63,10 @@ const Hero = () => {
 
           if (response.status === 200) {
             console.log(`File ${fileData.name} uploaded successfully`);
-            // toast.success(`File ${fileData.name} uploaded successfully`, {
-            //   position: "top-right",
-            //   autoClose: 5000,
-            // });
+            const fileInput = document.getElementById("file-input");
+            if (fileInput) {
+              fileInput.value = "";
+            }
           } else {
             console.error(`File ${fileData.name} upload failed`);
             toast.error(`File upload failed`, {
@@ -108,16 +108,17 @@ const Hero = () => {
   return (
     <main className={`${styles.container} bg-image`}>
       <div className="h-full text-center flex flex-col justify-between items-center pb-48">
-        <h1 className="pt-3 text-black font-serif text-lg md:text-2xl">
+        <h1 className="pt-3 text-white font-serif text-lg md:text-2xl">
           Welcome to {`Ananda and Vishal's Wedding`}
         </h1>
 
         <div className="flex flex-col justify-center items-center">
-          <h1 className="text-black font-serif pb-2 text-lg md:text-2xl">
+          <h1 className="text-white font-serif pb-2 text-lg md:text-2xl">
             Send us a photo for our gallery!
           </h1>
 
           <input
+            id="file-input"
             className="pl-40 pb-2 md:text-xl"
             type="file"
             onChange={handleFileChange}
