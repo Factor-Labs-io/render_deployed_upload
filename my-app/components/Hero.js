@@ -107,7 +107,7 @@ const Hero = () => {
 
   return (
     <main className={`${styles.container} bg-image`}>
-      <div className="h-full text-center flex flex-col justify-between items-center pb-48">
+      <div className="h-full text-center flex flex-col justify-between items-center pb-36">
         <h1 className="pt-3 text-white font-serif text-lg md:text-2xl">
           Welcome to {`Ananda and Vishal's Wedding`}
         </h1>
@@ -127,7 +127,7 @@ const Hero = () => {
           />
 
           <button
-            className="md:text-xl text-white bg-gradient-to-br from-green-700 to-green-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+            className="md:text-xl text-white bg-gradient-to-br from-green-600 to-green-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
             onClick={handleUpload}
             disabled={uploading}
           >
