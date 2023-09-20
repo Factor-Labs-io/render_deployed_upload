@@ -5,66 +5,76 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Hero = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState(null);
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    const files = event.target.files;
 
-    if (file) {
-      const reader = new FileReader();
+    if (files && files.length > 0) {
+      const fileDataArray = [];
 
-      reader.onload = (e) => {
-        const fileData = e.target.result;
-        setSelectedFile({ name: file.name, data: fileData });
-      };
+      for (const file of files) {
+        const reader = new FileReader();
 
-      reader.readAsArrayBuffer(file);
+        reader.onload = (e) => {
+          const fileData = e.target.result;
+          fileDataArray.push({ name: file.name, data: fileData });
+
+          // If all files have been read, update the state with the array of file data
+          if (fileDataArray.length === files.length) {
+            setSelectedFiles(fileDataArray);
+          }
+        };
+
+        reader.readAsDataURL(file); // Read the file as a Data URL
+      }
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) {
-      console.error("No file selected for upload.");
+    if (!selectedFiles || selectedFiles.length === 0) {
+      console.error("No files selected for upload.");
       return;
     }
 
     console.log("Begin upload");
 
-    try {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(new Blob([selectedFile.data]));
+    const uploadPromises = selectedFiles.map(async (fileData) => {
+      try {
+        const base64Data = fileData.data.split(",")[1]; // Get the Base64-encoded data part
 
-      fileReader.onload = async () => {
-        const base64Data = fileReader.result.split(",")[1]; // Get the Base64-encoded data part
+        if (!base64Data) {
+          throw new Error(`Invalid file data for ${fileData.name}`);
+        }
 
         const data = {
-          name: selectedFile.name,
+          name: fileData.name,
           fileData: base64Data, // Send the Base64-encoded data
         };
 
-        try {
-          const response = await axios.post("/upload", data, {
-            headers: {
-              "Content-Type": "application/json", // Set the content type to JSON
-            },
-          });
+        const response = await axios.post("/upload", data, {
+          headers: {
+            "Content-Type": "application/json", // Set the content type to JSON
+          },
+        });
 
-          if (response.status === 200) {
-            console.log("File uploaded successfully");
-            // You can handle success (e.g., display a success message) here.
-          } else {
-            console.error("File upload failed");
-            // Handle errors (e.g., display an error message) here.
-          }
-        } catch (error) {
-          console.error("Error during upload:", error);
+        if (response.status === 200) {
+          console.log(`File ${fileData.name} uploaded successfully`);
+          // You can handle success (e.g., display a success message) here.
+        } else {
+          console.error(`File ${fileData.name} upload failed`);
           // Handle errors (e.g., display an error message) here.
         }
-      };
-    } catch (error) {
-      console.error("Error reading file:", error);
-      // Handle errors (e.g., display an error message) here.
-    }
+      } catch (error) {
+        console.error(`Error during upload of ${fileData.name}:`, error);
+        // Handle errors (e.g., display an error message) here.
+      }
+    });
+
+    // Wait for all uploads to complete
+    await Promise.all(uploadPromises);
+
+    console.log("All files uploaded.");
   };
 
   return (
@@ -86,6 +96,7 @@ const Hero = () => {
             type="file"
             onChange={handleFileChange}
             accept="image/*"
+            multiple
           />
 
           <button
