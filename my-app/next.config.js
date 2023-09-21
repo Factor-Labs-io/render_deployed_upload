@@ -8,7 +8,7 @@ module.exports = {
     return [
       {
         source: "/upload",
-        destination: "https://upload-wed-photo.dariusramnath.repl.co/upload",
+        destination: "https://imageupload.varounhanooman4.repl.co/upload",
       },
     ];
   },

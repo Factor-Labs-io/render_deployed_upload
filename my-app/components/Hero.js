@@ -41,7 +41,7 @@ const Hero = () => {
     }
     setUploading(true);
 
-    const promise = new Promise(async (resolve, reject) => {
+    const promise = new Promise(async (resolve) => {
       const uploadPromises = selectedFiles.map(async (fileData) => {
         try {
           const base64Data = fileData.data.split(",")[1]; // Get the Base64-encoded data part
@@ -57,7 +57,7 @@ const Hero = () => {
 
           const response = await axios.post("/upload", data, {
             headers: {
-              "Content-Type": "application/json", // Set the content type to JSON
+              "Content-Type": "application/json",
             },
           });
 
@@ -69,18 +69,9 @@ const Hero = () => {
             }
           } else {
             console.error(`File ${fileData.name} upload failed`);
-            toast.error(`File upload failed`, {
-              position: "top-right",
-              autoClose: 5000,
-            });
           }
         } catch (error) {
           console.error(`Error during upload of ${fileData.name}:`, error);
-          toast.error(`Error during upload: ${error.message}`, {
-            position: "top-right",
-            autoClose: 5000,
-          });
-          reject(error);
         }
       });
 
@@ -88,16 +79,16 @@ const Hero = () => {
         await Promise.all(uploadPromises);
         resolve();
       } catch (error) {
-        reject(error);
+        console.error("Error during upload:", error);
       }
     });
 
     // Use toast.promise to show "promise pending" notification
     const promiseId = toast.promise(promise, {
-      pending: "Uploading images...", // This is the "promise pending" message
-      success: "Upload complete!", // This is displayed when the promise resolves
-      error: "Upload failed!", // This is displayed when the promise rejects
-      closeOnClick: false, // Prevent the user from dismissing the notification
+      pending: "Uploading images...",
+      success: "Upload complete!",
+      error: "Upload failed!",
+      closeOnClick: false,
     });
 
     // Set up a callback to remove the "promise pending" notification when it's closed
